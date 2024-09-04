@@ -29,12 +29,19 @@ def ScrappingInfo(Link):
     data = BeautifulSoup(html_page, 'html.parser')
     title = data.find_all('div', class_='name-0-2-233')
     inf = data.find_all('p')
+    rows = []
 
     for i in inf:
         desc = i.text.strip('p')
+        rows.append(desc)
 
     print(title)
     print(desc)
+
+    data_dict = {'Row': desc}
+    df = pd.DataFrame(data_dict)
+
+    print(df)
 
 
 ScrappingInfo("/latam/on-demand/series/66105c7d5483810014dcb3a9")
