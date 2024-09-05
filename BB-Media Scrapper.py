@@ -17,7 +17,7 @@ def ScrappingLinks():
     data_dict = {'Row': rows}
     df = pd.DataFrame(data_dict)
 
-    csv_path = 'c:/Users/Trump/Documents/WallyCode/BB-Media/EX_links.csv'
+    csv_path = 'c:/VS-Code/BB-Media/EX_links.csv'
     df.to_csv(csv_path, index=False)
 
     print(df)
@@ -27,21 +27,35 @@ def ScrappingInfo(Link):
     HTML = f"https://pluto.tv{Link}"
     html_page = requests.get(HTML).text
     data = BeautifulSoup(html_page, 'html.parser')
-    title = data.find_all('div', class_='name-0-2-233')
+    title = data.find('h1')
     inf = data.find_all('p')
-    rows = []
 
+    descripcion = []
+    nombre = []
+
+    for i in title:
+        titu = i.text.strip('h1')
+        if titu:
+            nombre.append(titu)
     for i in inf:
         desc = i.text.strip('p')
-        rows.append(desc)
+        if desc:
+            descripcion.append(desc)
 
-    print(title)
-    print(desc)
-
-    data_dict = {'Row': desc}
+    data_dict = {'Nombre': nombre, 'Descripcion': descripcion}
     df = pd.DataFrame(data_dict)
+
+    csv_path = 'c:/VS-Code/BB-Media/Series.csv'
+    df.to_csv(csv_path, index=False)
 
     print(df)
 
 
-ScrappingInfo("/latam/on-demand/series/66105c7d5483810014dcb3a9")
+def Start():
+    csv_path = 'c:/VS-Code/BB-Media/EX_links.csv'
+    df = pd.read_csv(csv_path)
+    ex_links = df['EX Links']
+
+    rows = []
+    for link in ex_links:
+        ScrappingInfo(link)
