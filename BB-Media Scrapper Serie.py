@@ -2,6 +2,7 @@ import requests
 import pandas as pd
 from bs4 import BeautifulSoup
 import os
+import time
 
 
 def ScrappingLinks(Link):
@@ -16,13 +17,18 @@ def ScrappingLinks(Link):
             rows.append(href)
 
     data_dict = {'Row': rows}
-    df = pd.DataFrame(data_dict)
+    new_df = pd.DataFrame(data_dict)
 
     csv_path = 'C:/VS-Code/BB-Media/EXLinksSeries.csv'
-    file_exists = os.path.isfile(csv_path)
-    df.to_csv(csv_path, mode='a', index=True, header=not file_exists)
+    if os.path.isfile(csv_path):
+        existing_df = pd.read_csv(csv_path)
+        combined_df = pd.concat([existing_df, new_df])
+        combined_df.drop_duplicates(subset=['Row'], inplace=True)
+    else:
+        combined_df = new_df
+    combined_df.to_csv(csv_path, mode='w', index=False)
 
-    print(df)
+    print(combined_df)
 
 
 def ScrappingInfo(Link):
@@ -52,16 +58,21 @@ def ScrappingInfo(Link):
     file_exists = os.path.isfile(csv_path)
     df.to_csv(csv_path, mode='a', index=False, header=not file_exists)
 
-    print(df)
+    print(nombre)
 
 
 def Start():
+    start_time = time.time()
     csv_path = 'C:/VS-Code/BB-Media/EXLinksSeries.csv'
     df = pd.read_csv(csv_path)
     ex_links = df['Row']
 
     for link in ex_links:
         ScrappingInfo(link)
+
+    end_time = time.time()
+    execution_time = end_time - start_time
+    print(f"Tiempo de ejecución series: {execution_time:.4f} segundos")
 
 
 ScrappingLinks(
