@@ -19,7 +19,9 @@ def ScrappingLinks(Link):
     data_dict = {'Row': rows}
     new_df = pd.DataFrame(data_dict)
 
-    csv_path = 'C:/VS-Code/BB-Media/EXLinksSeries.csv'
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    csv_path = os.path.join(script_dir, 'Links', 'LinksSeries.csv')
+
     if os.path.isfile(csv_path):
         existing_df = pd.read_csv(csv_path)
         combined_df = pd.concat([existing_df, new_df])
@@ -38,23 +40,16 @@ def ScrappingInfo(Link):
     title = data.find('h1')
     inf = data.find_all('p')
 
-    descripcion = []
-    nombre = []
+    descripcion = [p.text.strip() for p in inf if p.text.strip()]
+    nombre = title.text.strip() if title else "N/A"
     link = HTML
-
-    for i in title:
-        titu = i.text.strip('h1')
-        if titu:
-            nombre.append(titu)
-    for i in inf:
-        desc = i.text.strip('p')
-        if desc:
-            descripcion.append(desc)
 
     data_dict = {'Nombre': nombre, 'Link': link, 'Descripcion': descripcion}
     df = pd.DataFrame(data_dict)
 
-    csv_path = 'C:/VS-Code/BB-Media/Series.csv'
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    csv_path = os.path.join(script_dir, 'DataBase', 'Series.csv')
+
     file_exists = os.path.isfile(csv_path)
     df.to_csv(csv_path, mode='a', index=False, header=not file_exists)
 
@@ -63,7 +58,10 @@ def ScrappingInfo(Link):
 
 def Start():
     start_time = time.time()
-    csv_path = 'C:/VS-Code/BB-Media/EXLinksSeries.csv'
+
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    csv_path = os.path.join(script_dir, 'Links', 'LinksSeries.csv')
+
     df = pd.read_csv(csv_path)
     ex_links = df['Row']
 
@@ -71,6 +69,7 @@ def Start():
         ScrappingInfo(link)
 
     end_time = time.time()
+
     execution_time = end_time - start_time
     print(f"Tiempo de ejecución series: {execution_time:.4f} segundos")
 

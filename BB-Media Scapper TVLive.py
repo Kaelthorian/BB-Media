@@ -1,8 +1,5 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 import requests
 import pandas as pd
 from bs4 import BeautifulSoup
@@ -23,18 +20,22 @@ def Scrapping():
     html_page = requests.get(current_url).text
     data = BeautifulSoup(html_page, 'html.parser')
     span = data.find_all('span')
-    grid = data.find_all('span', classs_='name-item')
-    print(grid)
     canal = []
+
     for i in span:
         titu = i.text.strip()
+        if '@' in titu:
+            continue
+        if '©' in titu:
+            continue
         canal.append(titu)
-        # print(canal)
 
     new_data_dict = {'Canal': canal}
     new_df = pd.DataFrame(new_data_dict)
 
-    csv_path = 'C:/VS-Code/BB-Media/TV.csv'
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    csv_path = os.path.join(script_dir, 'DataBase', 'TV.csv')
+
     if os.path.isfile(csv_path):
         existing_df = pd.read_csv(csv_path)
         combined_df = pd.concat([existing_df, new_df])
